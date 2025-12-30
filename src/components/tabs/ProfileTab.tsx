@@ -191,7 +191,10 @@ export function ProfileTab({ profileData, dailyData, loading }: ProfileTabProps)
       {/* 2. 프로필 행동 */}
       <section className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition-shadow h-[100px] flex flex-col justify-between">
-          <span className="text-xs text-slate-500">프로필 방문</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-500">프로필 방문</span>
+            <InfoTooltip metricKey="profileVisits" />
+          </div>
           <div className="text-2xl font-bold text-slate-900">{profileActions.profileVisits.toLocaleString()}</div>
           <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
             <TrendingUp size={12} />
@@ -199,7 +202,10 @@ export function ProfileTab({ profileData, dailyData, loading }: ProfileTabProps)
           </div>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition-shadow h-[100px] flex flex-col justify-between">
-          <span className="text-xs text-slate-500">웹사이트 클릭</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-500">웹사이트 클릭</span>
+            <InfoTooltip metricKey="websiteClicks" />
+          </div>
           <div className="text-2xl font-bold text-slate-900">{profileActions.websiteClicks.toLocaleString()}</div>
           <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
             <TrendingUp size={12} />
@@ -207,7 +213,10 @@ export function ProfileTab({ profileData, dailyData, loading }: ProfileTabProps)
           </div>
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition-shadow h-[100px] flex flex-col justify-between">
-          <span className="text-xs text-slate-500">클릭률</span>
+          <div className="flex items-center gap-1">
+            <span className="text-xs text-slate-500">클릭률</span>
+            <InfoTooltip metricKey="clickRate" />
+          </div>
           <div className="text-2xl font-bold text-slate-900">
             {((profileActions.websiteClicks / profileActions.profileVisits) * 100).toFixed(1)}%
           </div>
@@ -424,15 +433,24 @@ export function ProfileTab({ profileData, dailyData, loading }: ProfileTabProps)
         {/* 스토리 KPI */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="p-4 border border-slate-200 rounded-xl text-center">
-            <div className="text-xs text-slate-500 mb-1">평균 조회수</div>
+            <div className="flex items-center justify-center gap-1 text-xs text-slate-500 mb-1">
+              평균 조회수
+              <InfoTooltip metricKey="storyViews" />
+            </div>
             <div className="text-2xl font-bold text-primary-950">{storyStats.avgViews.toLocaleString()}</div>
           </div>
           <div className="p-4 border border-slate-200 rounded-xl text-center">
-            <div className="text-xs text-slate-500 mb-1">스토리 도달</div>
+            <div className="flex items-center justify-center gap-1 text-xs text-slate-500 mb-1">
+              스토리 도달
+              <InfoTooltip metricKey="storyReach" />
+            </div>
             <div className="text-2xl font-bold text-primary-950">{storyStats.reach.toLocaleString()}</div>
           </div>
           <div className="p-4 border border-slate-200 rounded-xl text-center">
-            <div className="text-xs text-slate-500 mb-1">링크 클릭</div>
+            <div className="flex items-center justify-center gap-1 text-xs text-slate-500 mb-1">
+              링크 클릭
+              <InfoTooltip metricKey="linkClicks" />
+            </div>
             <div className="text-2xl font-bold text-primary-950">{storyStats.linkClicks.toLocaleString()}</div>
           </div>
         </div>

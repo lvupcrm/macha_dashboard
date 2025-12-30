@@ -31,6 +31,7 @@ import {
   BarChart3,
   Calendar,
 } from 'lucide-react';
+import { InfoTooltip } from '../common/InfoTooltip';
 import type {
   Influencer,
   SeedingItem,
@@ -420,16 +421,19 @@ function CampaignKPICard({
   value,
   change,
   isPositive,
+  metricKey,
 }: {
   title: string;
   value: string;
   change: number;
   isPositive: boolean;
+  metricKey?: string;
 }) {
   return (
     <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition-shadow h-[100px] flex flex-col justify-between">
       <div className="flex items-center gap-1">
         <span className="text-xs text-slate-500">{title}</span>
+        {metricKey && <InfoTooltip metricKey={metricKey} />}
       </div>
       <div>
         <div className="text-2xl font-bold text-slate-900 leading-tight">{value}</div>
@@ -725,30 +729,35 @@ function CampaignPerformance({ campaign: _campaign }: { campaign: CampaignListIt
           value={formatNumber(performanceData.feedImpressions.value)}
           change={performanceData.feedImpressions.change}
           isPositive={true}
+          metricKey="feedImpressions"
         />
         <CampaignKPICard
           title="총 좋아요"
           value={formatNumber(performanceData.totalLikes.value)}
           change={performanceData.totalLikes.change}
           isPositive={true}
+          metricKey="totalLikes"
         />
         <CampaignKPICard
           title="총 비디오 재생 수"
           value={formatNumber(performanceData.totalVideoViews.value)}
           change={performanceData.totalVideoViews.change}
           isPositive={true}
+          metricKey="videoViews"
         />
         <CampaignKPICard
           title="총 공유 수"
           value={formatNumber(performanceData.totalShares.value)}
           change={performanceData.totalShares.change}
           isPositive={true}
+          metricKey="totalShares"
         />
         <CampaignKPICard
           title="총 댓글 수"
           value={formatNumber(performanceData.totalComments.value)}
           change={performanceData.totalComments.change}
           isPositive={true}
+          metricKey="totalComments"
         />
       </div>
 

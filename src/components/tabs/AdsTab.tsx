@@ -135,13 +135,18 @@ function AdKPICard({
 function SourcePieChart({
   title,
   data,
+  metricKey,
 }: {
   title: string;
   data: { name: string; value: number; color: string }[];
+  metricKey?: string;
 }) {
   return (
     <div className="bg-white rounded-2xl border border-slate-200 p-6">
-      <h4 className="text-lg font-semibold text-slate-900 mb-4">{title}</h4>
+      <div className="flex items-center gap-2 mb-4">
+        <h4 className="text-lg font-semibold text-slate-900">{title}</h4>
+        {metricKey && <InfoTooltip metricKey={metricKey} />}
+      </div>
       <div className="h-48">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -429,8 +434,8 @@ export function AdsTab({ adData, dailyData, loading }: AdsTabProps) {
       <section>
         <h3 className="text-lg font-semibold text-slate-900 mb-4">유기적 vs 광고 성과 비교</h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <SourcePieChart title="도달 출처" data={reachSourceData} />
-          <SourcePieChart title="참여 출처" data={engagementSourceData} />
+          <SourcePieChart title="도달 출처" data={reachSourceData} metricKey="reachSource" />
+          <SourcePieChart title="참여 출처" data={engagementSourceData} metricKey="engagementSource" />
         </div>
       </section>
 

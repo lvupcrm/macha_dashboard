@@ -499,4 +499,56 @@ export const METRIC_DEFINITIONS: Record<string, MetricDefinition> = {
     title: 'Organic (오가닉)',
     description: '광고 없이 자연적으로 발생한 도달, 참여 등을 의미합니다.',
   },
+  profileVisits: {
+    title: 'Profile Visits (프로필 방문)',
+    description: '프로필 페이지를 방문한 사용자 수입니다. 브랜드 관심도를 나타냅니다.',
+  },
+  websiteClicks: {
+    title: 'Website Clicks (웹사이트 클릭)',
+    description: '프로필의 웹사이트 링크를 클릭한 횟수입니다. 구매 전환의 선행 지표입니다.',
+  },
+  clickRate: {
+    title: 'Click Rate (클릭률)',
+    description: '프로필 방문 대비 웹사이트 클릭 비율입니다. 높을수록 CTA가 효과적입니다.',
+  },
+  storyViews: {
+    title: 'Story Views (스토리 조회)',
+    description: '스토리를 본 사용자 수입니다. 24시간 동안 유효한 휘발성 콘텐츠의 도달력을 측정합니다.',
+  },
+  storyReach: {
+    title: 'Story Reach (스토리 도달)',
+    description: '스토리에 도달한 고유 사용자 수입니다.',
+  },
+  linkClicks: {
+    title: 'Link Clicks (링크 클릭)',
+    description: '스토리 내 링크 스티커나 스와이프업을 통한 클릭 수입니다.',
+  },
+  feedImpressions: {
+    title: 'Feed Impressions (노출 피드 수)',
+    description: '캠페인 관련 피드 게시물이 사용자에게 노출된 총 횟수입니다.',
+  },
+  totalLikes: {
+    title: 'Total Likes (총 좋아요)',
+    description: '캠페인 기간 동안 발생한 모든 좋아요 수입니다.',
+  },
+  videoViews: {
+    title: 'Video Views (비디오 재생 수)',
+    description: '영상 콘텐츠가 재생된 총 횟수입니다. 3초 이상 시청 시 카운트됩니다.',
+  },
+  totalShares: {
+    title: 'Total Shares (총 공유 수)',
+    description: 'DM이나 스토리로 콘텐츠가 공유된 횟수입니다. 바이럴 효과의 지표입니다.',
+  },
+  totalComments: {
+    title: 'Total Comments (총 댓글 수)',
+    description: '게시물에 달린 댓글 수입니다. 참여도와 관심도를 나타냅니다.',
+  },
+  reachSource: {
+    title: 'Reach Source (도달 출처)',
+    description: '도달이 발생한 출처 비율입니다. 광고와 유기적 도달의 비율을 확인할 수 있습니다.',
+  },
+  engagementSource: {
+    title: 'Engagement Source (참여 출처)',
+    description: '참여가 발생한 출처 비율입니다. 광고와 유기적 참여의 비율을 확인할 수 있습니다.',
+  },
 };

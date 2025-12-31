@@ -2,7 +2,7 @@
 // 타입 정의
 // ============================================
 
-export type TabType = 'profile' | 'ads' | 'campaign' | 'influencer';
+export type TabType = 'profile' | 'ads' | 'campaign';
 export type PeriodType = 'daily' | 'weekly' | 'monthly' | 'custom';
 export type PlatformType = 'instagram' | 'youtube' | 'tiktok';
 export type SeedingType = 'free' | 'paid';

@@ -4,7 +4,6 @@ import {
   User,
   TrendingUp,
   Megaphone,
-  Search,
   RefreshCw,
   Share2,
   Copy,
@@ -12,12 +11,11 @@ import {
   ExternalLink,
   X,
 } from 'lucide-react';
-import type { TabType, PeriodType, Influencer, SeedingItem } from './types';
+import type { PeriodType, SeedingItem } from './types';
 import { PeriodFilter } from './components/common/PeriodFilter';
 import { ProfileTab } from './components/tabs/ProfileTab';
 import { AdsTab } from './components/tabs/AdsTab';
 import { CampaignTab } from './components/tabs/CampaignTab';
-import { InfluencerTab } from './components/tabs/InfluencerTab';
 import { CAMPAIGN_INFO } from './data/dummyData';
 import {
   useProfileInsight,
@@ -30,6 +28,9 @@ import {
   useContentList,
   useAIAnalysis,
 } from './hooks/useApi';
+
+// 탭 타입 (인플루언서 탭 제거)
+type TabType = 'profile' | 'ads' | 'campaign';
 
 // ============================================
 // 메인 App 컴포넌트
@@ -61,18 +62,6 @@ function App() {
     }
   }, [seedingList]);
 
-  // 인플루언서를 캠페인에 추가하는 함수
-  const handleAddInfluencerToCampaign = useCallback((influencer: Influencer, campaignId: string) => {
-    const newSeedingItem: SeedingItem = {
-      id: `seeding-${Date.now()}`,
-      campaignId,
-      influencer,
-      type: 'free',
-      status: 'pending',
-      requestDate: new Date().toISOString().split('T')[0],
-    };
-    setLocalSeedingList(prev => [...prev, newSeedingItem]);
-  }, []);
   const { data: affiliateLinks, loading: affiliateLoading, refetch: refetchAffiliate } = useAffiliateLinks();
   const { data: contentList, loading: contentLoading, refetch: refetchContent } = useContentList();
   const { data: aiAnalysis, loading: aiLoading, refetch: refetchAI } = useAIAnalysis();
@@ -99,12 +88,11 @@ function App() {
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  // 탭 설정
+  // 탭 설정 (인플루언서 탭 제거)
   const tabs: { key: TabType; label: string; icon: typeof User }[] = [
     { key: 'profile', label: '프로필 인사이트', icon: User },
     { key: 'ads', label: '광고 성과', icon: TrendingUp },
     { key: 'campaign', label: '캠페인 관리', icon: Megaphone },
-    { key: 'influencer', label: '인플루언서 검색', icon: Search },
   ];
 
   // 로딩 상태 계산
@@ -112,7 +100,6 @@ function App() {
     profile: profileLoading || dailyProfileLoading,
     ads: adLoading || dailyAdLoading,
     campaign: influencersLoading || seedingLoading || affiliateLoading || contentLoading || aiLoading,
-    influencer: influencersLoading,
   };
 
   return (
@@ -233,14 +220,6 @@ function App() {
             contentList={contentList}
             aiAnalysis={aiAnalysis}
             loading={isLoading.campaign}
-          />
-        )}
-
-        {activeTab === 'influencer' && (
-          <InfluencerTab
-            influencers={influencers}
-            loading={isLoading.influencer}
-            onAddToCampaign={handleAddInfluencerToCampaign}
           />
         )}
       </main>

@@ -23,9 +23,10 @@ export default async function handler(req, res) {
       page_size: 100,
     };
 
+    // 캠페인 ID로 필터링 (실제 속성명: '캠페인 DB')
     if (campaignId) {
       queryOptions.filter = {
-        property: '캠페인',
+        property: '캠페인 DB',
         relation: { contains: campaignId },
       };
     }
@@ -34,21 +35,28 @@ export default async function handler(req, res) {
 
     const mentions = response.results.map((page) => {
       const props = page.properties;
+
+      // 썸네일 URL 추출
+      const thumbnailFile = props['displayUrl']?.files?.[0];
+      const thumbnail = thumbnailFile?.external?.url || thumbnailFile?.file?.url || '';
+
       return {
         id: page.id,
-        influencerName: props['크리에이터']?.rich_text?.[0]?.plain_text || props['인플루언서']?.relation?.[0]?.id || '',
-        platform: props['플랫폼']?.select?.name || 'instagram',
-        type: props['콘텐츠유형']?.select?.name || props['유형']?.select?.name || 'post',
-        likes: props['좋아요']?.number || 0,
-        comments: props['댓글']?.number || 0,
-        shares: props['공유']?.number || 0,
-        views: props['조회수']?.number || 0,
-        reach: props['도달']?.number || 0,
-        impressions: props['노출']?.number || 0,
-        engagementRate: props['참여율']?.number || 0,
-        postUrl: props['게시물URL']?.url || props['URL']?.url || '',
-        postedAt: props['게시일']?.date?.start || '',
-        caption: props['캡션']?.rich_text?.[0]?.plain_text || '',
+        influencerName: props['ownerFulName']?.rich_text?.[0]?.plain_text || props['ownerUsername']?.rich_text?.[0]?.plain_text || '',
+        handle: props['ownerUsername']?.rich_text?.[0]?.plain_text || '',
+        platform: 'instagram',
+        type: props['type']?.select?.name?.toLowerCase() || 'post',
+        likes: props['likesCounts']?.number || 0,
+        comments: props['commentsCount']?.number || 0,
+        shares: props['reshareCount']?.number || 0,
+        views: props['VideoPlayCount']?.number || 0,
+        reach: 0,
+        impressions: 0,
+        engagementRate: 0,
+        postUrl: props['Post URL']?.url || '',
+        postedAt: props['피드게시일']?.date?.start || '',
+        caption: props['caption']?.rich_text?.[0]?.plain_text || '',
+        thumbnail,
       };
     });
 

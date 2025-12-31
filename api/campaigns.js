@@ -19,23 +19,39 @@ export default async function handler(req, res) {
   try {
     const response = await notion.databases.query({
       database_id: DB_IDS.campaigns,
+      filter: {
+        property: '캠페인명',
+        title: {
+          equals: '스웻이프',
+        },
+      },
     });
 
     const campaigns = response.results.map((page) => {
       const props = page.properties;
+
+      // 협찬 제품 목록 추출
+      const products = props['협찬 제품']?.multi_select?.map(p => p.name) || [];
+
       return {
         id: page.id,
-        name: props['캠페인명']?.title?.[0]?.plain_text || props['이름']?.title?.[0]?.plain_text || '',
-        category: props['카테고리']?.select?.name || props['카테고리']?.multi_select?.[0]?.name || '',
-        campaignType: props['캠페인유형']?.select?.name || '협찬',
-        productType: props['협찬제품']?.select?.name || props['제품유형']?.select?.name || '',
-        participants: props['참여인원']?.number || props['참여자수']?.rollup?.number || 0,
-        startDate: props['시작일']?.date?.start || props['캠페인시작일']?.date?.start || '',
-        endDate: props['종료일']?.date?.start || props['캠페인종료일']?.date?.start || '',
-        manager: props['담당자']?.rich_text?.[0]?.plain_text || props['담당자']?.people?.[0]?.name || '',
-        status: props['상태']?.select?.name || props['진행상태']?.select?.name || 'active',
-        budget: props['예산']?.number || 0,
-        spent: props['집행금액']?.number || 0,
+        name: props['캠페인명']?.title?.[0]?.plain_text || '',
+        category: props['카테고리']?.select?.name || '',
+        campaignType: props['캠페인 유형']?.select?.name || '협찬',
+        productType: products.join(', '),
+        participants: props['캠페인 총 참여 인원']?.rollup?.number || 0,
+        startDate: props['캠페인 시작일']?.date?.start || '',
+        endDate: props['캠페인 종료일']?.date?.start || '',
+        manager: props['담당자']?.people?.[0]?.name || '',
+        status: props['상태']?.status?.name || 'active',
+        budget: props['예산(만원)']?.number || 0,
+        spent: 0,
+        // 성과 데이터
+        totalLikes: 0,
+        totalComments: 0,
+        totalShares: 0,
+        totalViews: 0,
+        totalMentions: props['총 맨션 피드 수']?.formula?.number || 0,
       };
     });
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -30,8 +30,10 @@ import {
   TrendingUp,
   BarChart3,
   Calendar,
+  Loader2,
 } from 'lucide-react';
 import { InfoTooltip } from '../common/InfoTooltip';
+import { fetchCampaigns, type NotionCampaign } from '../../services/notionApi';
 import type {
   Influencer,
   SeedingItem,
@@ -62,7 +64,7 @@ const formatCurrency = (num: number): string => {
   return num.toLocaleString() + '원';
 };
 
-// 캠페인 목록 더미 데이터
+// 캠페인 목록 타입 (Notion 데이터와 호환)
 interface CampaignListItem {
   id: string;
   name: string;
@@ -75,10 +77,6 @@ interface CampaignListItem {
   manager: string;
   status: 'active' | 'paused' | 'completed';
 }
-
-const campaignListData: CampaignListItem[] = [
-  { id: '1', name: '스웻이프', category: '크로스핏/...', campaignType: '협찬', productType: '생활용품', participants: 40, startDate: '2025년 9월 1일', endDate: '2025년 12월 31일', manager: '', status: 'active' },
-];
 
 // Seeding Status Badge
 function SeedingStatusBadge({ status }: { status: SeedingStatus }) {
@@ -900,18 +898,37 @@ function CampaignPerformance({ campaign: _campaign }: { campaign: CampaignListIt
 }
 
 // 캠페인 목록 테이블 컴포넌트
-function CampaignListTable({ onSelectCampaign }: { onSelectCampaign: (campaign: CampaignListItem) => void }) {
+function CampaignListTable({
+  campaigns,
+  loading,
+  onSelectCampaign
+}: {
+  campaigns: CampaignListItem[];
+  loading: boolean;
+  onSelectCampaign: (campaign: CampaignListItem) => void;
+}) {
   const [statusFilter, setStatusFilter] = useState<'active' | 'completed'>('active');
 
-  const filteredCampaigns = campaignListData.filter((campaign) => {
+  const filteredCampaigns = campaigns.filter((campaign) => {
     if (statusFilter === 'active') {
       return campaign.status === 'active' || campaign.status === 'paused';
     }
     return campaign.status === 'completed';
   });
 
-  const activeCount = campaignListData.filter((c) => c.status === 'active' || c.status === 'paused').length;
-  const completedCount = campaignListData.filter((c) => c.status === 'completed').length;
+  const activeCount = campaigns.filter((c) => c.status === 'active' || c.status === 'paused').length;
+  const completedCount = campaigns.filter((c) => c.status === 'completed').length;
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+        <div className="flex items-center justify-center h-32 text-slate-500">
+          <Loader2 className="w-6 h-6 animate-spin mr-2" />
+          Notion에서 캠페인 데이터를 불러오는 중...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
@@ -1082,6 +1099,22 @@ function CampaignDetailView({
   );
 }
 
+// Notion 캠페인 데이터를 CampaignListItem 형식으로 변환
+function convertNotionCampaign(campaign: NotionCampaign): CampaignListItem {
+  return {
+    id: campaign.id,
+    name: campaign.name,
+    category: campaign.category,
+    campaignType: campaign.campaignType as '협찬' | '유료',
+    productType: campaign.productType,
+    participants: campaign.participants,
+    startDate: campaign.startDate,
+    endDate: campaign.endDate,
+    manager: campaign.manager,
+    status: campaign.status as 'active' | 'paused' | 'completed',
+  };
+}
+
 // Main Component
 export function CampaignTab({
   influencers: _influencers,
@@ -1089,14 +1122,44 @@ export function CampaignTab({
   affiliateLinks,
   contentList,
   aiAnalysis,
-  loading,
+  loading: _loading,
 }: CampaignTabProps) {
   const [selectedCampaign, setSelectedCampaign] = useState<CampaignListItem | null>(null);
+  const [campaigns, setCampaigns] = useState<CampaignListItem[]>([]);
+  const [notionLoading, setNotionLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  if (loading) {
+  // Notion에서 캠페인 데이터 로드
+  useEffect(() => {
+    const loadCampaigns = async () => {
+      try {
+        setNotionLoading(true);
+        setError(null);
+        const notionCampaigns = await fetchCampaigns();
+        const convertedCampaigns = notionCampaigns.map(convertNotionCampaign);
+        setCampaigns(convertedCampaigns);
+      } catch (err) {
+        console.error('캠페인 로드 실패:', err);
+        setError('캠페인 데이터를 불러오는데 실패했습니다.');
+      } finally {
+        setNotionLoading(false);
+      }
+    };
+
+    loadCampaigns();
+  }, []);
+
+  // 에러 표시
+  if (error) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-500">
-        데이터를 불러오는 중...
+      <div className="bg-red-50 border border-red-200 rounded-2xl p-6 text-center">
+        <p className="text-red-600">{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
@@ -1118,7 +1181,11 @@ export function CampaignTab({
   // 기본: 캠페인 목록 표시
   return (
     <div className="space-y-6">
-      <CampaignListTable onSelectCampaign={setSelectedCampaign} />
+      <CampaignListTable
+        campaigns={campaigns}
+        loading={notionLoading}
+        onSelectCampaign={setSelectedCampaign}
+      />
     </div>
   );
 }

@@ -64,7 +64,7 @@ export interface NotionCampaign {
   startDate: string;
   endDate: string;
   manager: string;
-  status: 'active' | 'paused' | 'completed';
+  status: string; // Notion에서 '진행중', '완료' 등 한국어 상태값이 옴
   budget: number;
   spent: number;
 }

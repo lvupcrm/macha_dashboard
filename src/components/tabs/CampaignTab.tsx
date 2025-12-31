@@ -75,7 +75,7 @@ interface CampaignListItem {
   startDate: string;
   endDate: string;
   manager: string;
-  status: 'active' | 'paused' | 'completed';
+  status: string; // Notion에서 '진행중', '완료' 등 한국어 상태값이 올 수 있음
 }
 
 // Seeding Status Badge
@@ -909,15 +909,21 @@ function CampaignListTable({
 }) {
   const [statusFilter, setStatusFilter] = useState<'active' | 'completed'>('active');
 
+  // 상태 매핑 (Notion 한국어 상태값 처리)
+  const isActive = (status: string) =>
+    status === 'active' || status === 'paused' || status === '진행중' || status === '일시정지' || status === '진행';
+  const isCompleted = (status: string) =>
+    status === 'completed' || status === '완료' || status === '종료';
+
   const filteredCampaigns = campaigns.filter((campaign) => {
     if (statusFilter === 'active') {
-      return campaign.status === 'active' || campaign.status === 'paused';
+      return isActive(campaign.status);
     }
-    return campaign.status === 'completed';
+    return isCompleted(campaign.status);
   });
 
-  const activeCount = campaigns.filter((c) => c.status === 'active' || c.status === 'paused').length;
-  const completedCount = campaigns.filter((c) => c.status === 'completed').length;
+  const activeCount = campaigns.filter((c) => isActive(c.status)).length;
+  const completedCount = campaigns.filter((c) => isCompleted(c.status)).length;
 
   if (loading) {
     return (
@@ -1022,13 +1028,11 @@ function CampaignListTable({
                 <td className="py-4 px-4 text-sm text-slate-400">{campaign.manager || '-'}</td>
                 <td className="py-4 px-4 text-center">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                    campaign.status === 'active'
+                    isActive(campaign.status)
                       ? 'bg-emerald-100 text-emerald-700'
-                      : campaign.status === 'paused'
-                      ? 'bg-amber-100 text-amber-700'
                       : 'bg-slate-100 text-slate-700'
                   }`}>
-                    {campaign.status === 'active' ? '진행' : campaign.status === 'paused' ? '일시정지' : '완료'}
+                    {isActive(campaign.status) ? '진행중' : '완료'}
                   </span>
                 </td>
               </tr>
@@ -1205,7 +1209,7 @@ function convertNotionCampaign(campaign: NotionCampaign): CampaignListItem {
     startDate: campaign.startDate,
     endDate: campaign.endDate,
     manager: campaign.manager,
-    status: campaign.status as 'active' | 'paused' | 'completed',
+    status: campaign.status, // Notion에서 한국어 상태값 ('진행중', '완료' 등)이 직접 옴
   };
 }
 

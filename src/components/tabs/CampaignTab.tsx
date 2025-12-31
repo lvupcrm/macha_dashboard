@@ -78,15 +78,27 @@ interface CampaignListItem {
 }
 
 // Seeding Status Badge
-function SeedingStatusBadge({ status }: { status: SeedingStatus }) {
-  const config = {
+function SeedingStatusBadge({ status }: { status: SeedingStatus | string }) {
+  const config: Record<string, { icon: typeof Clock; color: string; label: string }> = {
+    // 영어 상태값
     pending: { icon: Clock, color: 'bg-slate-100 text-slate-600', label: '대기중' },
     contacted: { icon: AlertCircle, color: 'bg-amber-100 text-amber-700', label: '컨택중' },
     confirmed: { icon: CheckCircle2, color: 'bg-blue-100 text-blue-700', label: '확정' },
     completed: { icon: CheckCircle2, color: 'bg-emerald-100 text-emerald-700', label: '완료' },
     cancelled: { icon: XCircle, color: 'bg-red-100 text-red-600', label: '취소' },
+    // 한국어 상태값 (Notion에서 올 수 있음)
+    '대기중': { icon: Clock, color: 'bg-slate-100 text-slate-600', label: '대기중' },
+    '컨택중': { icon: AlertCircle, color: 'bg-amber-100 text-amber-700', label: '컨택중' },
+    '확정': { icon: CheckCircle2, color: 'bg-blue-100 text-blue-700', label: '확정' },
+    '완료': { icon: CheckCircle2, color: 'bg-emerald-100 text-emerald-700', label: '완료' },
+    '취소': { icon: XCircle, color: 'bg-red-100 text-red-600', label: '취소' },
+    '진행중': { icon: Clock, color: 'bg-emerald-100 text-emerald-700', label: '진행중' },
+    '진행': { icon: Clock, color: 'bg-emerald-100 text-emerald-700', label: '진행중' },
   };
-  const { icon: Icon, color, label } = config[status];
+
+  // fallback for unknown status
+  const statusConfig = config[status] || { icon: Clock, color: 'bg-slate-100 text-slate-600', label: status || '알 수 없음' };
+  const { icon: Icon, color, label } = statusConfig;
 
   return (
     <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${color}`}>
